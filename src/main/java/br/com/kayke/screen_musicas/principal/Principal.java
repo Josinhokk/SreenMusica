@@ -5,6 +5,7 @@ import br.com.kayke.screen_musicas.models.Categoria;
 import br.com.kayke.screen_musicas.models.Musica;
 import br.com.kayke.screen_musicas.repositorios.artistaRepositorio;
 import br.com.kayke.screen_musicas.repositorios.musicaRepositorio;
+import br.com.kayke.screen_musicas.service.Gemini;
 import jdk.swing.interop.SwingInterOpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -57,12 +58,12 @@ public class Principal {
                 case 3:
                     listarMusicas();
                     break;
-//                case 4:
-//                    buscarMusicasPorArtista();
-//                    break;
-//                case 5:
-//                    pesquisarDadosDoArtista();
-//                    break;
+                case 4:
+                    buscarMusicasPorArtista();
+                    break;
+                case 5:
+                    pesquisarDadosDoArtista();
+                    break;
                 case 9:
                     System.out.println("Encerrando a aplicação!");
                     break;
@@ -101,7 +102,7 @@ public class Principal {
         Optional<Artista> artistaProcurado = artistaRepositorio.getArtistaByNomeEqualsIgnoreCase((artistaCompositor));
         if (artistaProcurado.isPresent()) {
             Artista artista = artistaProcurado.get();
-            Musica musicaProcurada = new Musica(musica, genero,artista);
+            Musica musicaProcurada = new Musica(musica, genero, artista);
             musicaRepositorio.save(musicaProcurada);
             System.out.println("MUSICA CADASTRADA COM SUCESSO!");
         }else {
@@ -139,6 +140,22 @@ public class Principal {
         ));
 
     }
+
+    private void buscarMusicasPorArtista() {
+        System.out.println("Digite o nome do artista que deseja ver as musicas:");
+        var artista = leitura.nextLine();
+        List<Musica> musicasEncontradas = musicaRepositorio.musicaPorNomeArtista(artista);
+        musicasEncontradas.forEach(m -> System.out.println(m.getNome()));
+
+    }
+
+    private void pesquisarDadosDoArtista() {
+        Gemini gemini = new Gemini();
+        System.out.println("Digite o nome do artista que deseja saber sobre: ");
+        var nome = leitura.nextLine();
+        gemini.gerarDescrição(nome);
+    }
+
 
     public boolean verificarBanco(String artista){
         artistaRepositorio.existsArtistaByNomeContainingIgnoreCase(artista);

@@ -6,8 +6,8 @@ import jakarta.persistence.*;
 public class Musica {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 
     @Column
     private String nome;
