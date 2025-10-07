@@ -9,6 +9,7 @@ import jdk.swing.interop.SwingInterOpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -53,9 +54,9 @@ public class Principal {
                 case 2:
                     cadastrarMusicas();
                     break;
-//                case 3:
-//                    listarMusicas();
-//                    break;
+                case 3:
+                    listarMusicas();
+                    break;
 //                case 4:
 //                    buscarMusicasPorArtista();
 //                    break;
@@ -76,7 +77,7 @@ public class Principal {
     private void cadastrarArtistas() {
         System.out.println("Digite o nome do artista: ");
         var artista = leitura.nextLine();
-        if (!verificarBanco(artista)) {
+        if (verificarBanco(artista)) {
             System.out.println("Qual a categoria do artista: (Solo, Dupla, Banda)");
             var categoriaProcurada = leitura.nextLine();
             String categoria = String.valueOf(Categoria.procurarCategoria(categoriaProcurada));
@@ -102,6 +103,7 @@ public class Principal {
             Artista artista = artistaProcurado.get();
             Musica musicaProcurada = new Musica(musica, genero,artista);
             musicaRepositorio.save(musicaProcurada);
+            System.out.println("MUSICA CADASTRADA COM SUCESSO!");
         }else {
             System.out.println("ARTISTA NÃO CADASTRADO!!!");
             System.out.println("""
@@ -115,22 +117,26 @@ public class Principal {
             var opc = leitura.nextInt();
             leitura.nextLine();
             if(opc == 1){
-                cadastrarMusicas();
+                cadastrarArtistas();
                 System.out.println("ARTISTA CADASTRADO COM SUCESSO!!!");
-                System.out.println("Vamos prosseguir");
-                Musica musicaProcurada = new Musica(musica, genero,auxArtista);
-                musicaRepositorio.save(musicaProcurada);
-                System.out.println("MUSICA CADASTRADA COM SUCESSO!!!");
+//                System.out.println("Vamos prosseguir");
+//                Artista artistaMusical = artistaRepositorio.findByNomeContainingIgnoreCase(auxArtista.getNome());
+//                Musica musicaProcurada = new Musica(musica, genero, artistaMusical);
+//                musicaRepositorio.save(musicaProcurada);
+//                System.out.println("MUSICA CADASTRADA COM SUCESSO!!!");
+            }else{
+                System.out.println("Saindo...");
             }
-
-
-
-
         }
+    }
 
-
-
-
+    private void listarMusicas() {
+        List<Musica> musicas = musicaRepositorio.findAll();
+        musicas.forEach(m -> System.out.println(
+                "Musica: " + m.getNome()
+                + "\nGenero: " + m.getGenero()
+                + "\nArtista: " + m.getArtista().getNome()
+        ));
 
     }
 

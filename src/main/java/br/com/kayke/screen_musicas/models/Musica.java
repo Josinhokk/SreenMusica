@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 public class Musica {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column
@@ -13,6 +14,10 @@ public class Musica {
 
     @Column(nullable = false)
     private String genero;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Artista artista;
 
     public Musica() {
 
@@ -44,7 +49,17 @@ public class Musica {
         this.artista = artista;
     }
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Artista artista;
+    public String getNome() {
+        return nome;
+    }
+
+    public String getGenero() {
+        return genero;
+    }
+
+    public Artista getArtista() {
+        return artista;
+    }
+
+
 }
