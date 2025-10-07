@@ -14,6 +14,10 @@ public class Musica {
     @Column(nullable = false)
     private String genero;
 
+    public Musica() {
+
+    }
+
 //    @Column(nullable = false)
 //    private String duracao;
 
@@ -41,5 +45,6 @@ public class Musica {
     }
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private Artista artista;
 }

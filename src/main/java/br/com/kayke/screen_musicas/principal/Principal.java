@@ -5,9 +5,11 @@ import br.com.kayke.screen_musicas.models.Categoria;
 import br.com.kayke.screen_musicas.models.Musica;
 import br.com.kayke.screen_musicas.repositorios.artistaRepositorio;
 import br.com.kayke.screen_musicas.repositorios.musicaRepositorio;
+import jdk.swing.interop.SwingInterOpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 
@@ -20,6 +22,7 @@ public class Principal {
     @Autowired
     musicaRepositorio musicaRepositorio;
 
+    Artista auxArtista;
 
     Scanner leitura = new Scanner(System.in);
 
@@ -73,11 +76,17 @@ public class Principal {
     private void cadastrarArtistas() {
         System.out.println("Digite o nome do artista: ");
         var artista = leitura.nextLine();
-        System.out.println("Qual a categoria do artista: (Solo, Dupla, Banda)");
-        var categoriaProcurada = leitura.nextLine();
-        String categoria = String.valueOf(Categoria.procurarCategoria(categoriaProcurada));
-        Artista artistaProcurada = new Artista(artista, categoria);
-        artistaRepositorio.save(artistaProcurada);
+        if (!verificarBanco(artista)) {
+            System.out.println("Qual a categoria do artista: (Solo, Dupla, Banda)");
+            var categoriaProcurada = leitura.nextLine();
+            String categoria = String.valueOf(Categoria.procurarCategoria(categoriaProcurada));
+            Artista artistaProcurada = new Artista(artista, categoria);
+            artistaRepositorio.save(artistaProcurada);
+            auxArtista = artistaProcurada;
+        }
+        else {
+            System.out.println("Artista ja cadastrado!");
+        }
     }
 
     //Trocar por optional para evitar erros
@@ -88,12 +97,45 @@ public class Principal {
         var genero = leitura.nextLine();
         System.out.println("Qual Artista compositor dessa musica: ");
         String artistaCompositor = leitura.nextLine();
-        Artista artistaProcurado = artistaRepositorio.getArtistaByNomeEqualsIgnoreCase((artistaCompositor));
-        Musica musicaProcurada = new Musica(musica, genero,artistaProcurado);
-        musicaRepositorio.save(musicaProcurada);
+        Optional<Artista> artistaProcurado = artistaRepositorio.getArtistaByNomeEqualsIgnoreCase((artistaCompositor));
+        if (artistaProcurado.isPresent()) {
+            Artista artista = artistaProcurado.get();
+            Musica musicaProcurada = new Musica(musica, genero,artista);
+            musicaRepositorio.save(musicaProcurada);
+        }else {
+            System.out.println("ARTISTA NÃO CADASTRADO!!!");
+            System.out.println("""
+                    Deseja cadastra um artista?
+                    
+                    1 - Cadastrar artista
+                    2 - Sair
+                    
+                    
+                    """);
+            var opc = leitura.nextInt();
+            leitura.nextLine();
+            if(opc == 1){
+                cadastrarMusicas();
+                System.out.println("ARTISTA CADASTRADO COM SUCESSO!!!");
+                System.out.println("Vamos prosseguir");
+                Musica musicaProcurada = new Musica(musica, genero,auxArtista);
+                musicaRepositorio.save(musicaProcurada);
+                System.out.println("MUSICA CADASTRADA COM SUCESSO!!!");
+            }
+
+
+
+
+        }
+
+
+
 
 
     }
 
+    public boolean verificarBanco(String artista){
+        artistaRepositorio.existsArtistaByNomeContainingIgnoreCase(artista);
+        return true;
+    }
 }
-
